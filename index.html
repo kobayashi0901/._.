@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>注音暗語加密解密</title>
+<style>
+body { font-family: sans-serif; padding: 20px; }
+textarea { width: 100%; height: 140px; }
+button { padding: 10px 20px; margin: 10px 5px; }
+output { white-space: pre-wrap; display: block; margin-top: 10px; border: 1px solid #ddd; padding: 10px; min-height: 40px; }
+label { font-weight: bold; display:block; margin-bottom:8px; }
+</style>
+</head>
+<body>
+<h2>注音暗語加密 / 解密</h2>
+
+<label>輸入（加密請輸入注音+聲調，例如：ㄋㄧˇㄏㄠˇ；解密請輸入暗碼，每行一個音節）</label>
+<textarea id="input"></textarea>
+<br />
+<button onclick="encrypt()">加密 → 暗碼</button>
+<button onclick="decrypt()">解密 → 注音</button>
+<output id="out"></output>
+
+<script>
+const codeMap = {
+  'ㄅ': '.', 'ㄆ': '..', 'ㄇ': '…', 'ㄈ': '._.', 'ㄉ': '._…', 'ㄊ': '.._..', 'ㄋ': '…_.', 'ㄌ': '._.._.', 'ㄍ': '._._._.',
+  'ㄎ': '. ._.', 'ㄏ': '. .', 'ㄐ': '. ..', 'ㄑ': '. …', 'ㄒ': '. ._.', 'ㄓ': '. ._…', 'ㄔ': '. .._..', 'ㄕ': '. …_.', 'ㄖ': '. ._.._.', 'ㄗ': '. ._._._.',
+  'ㄘ': '.. ._.', 'ㄙ': '.. .', 'ㄧ': '.. ..', 'ㄨ': '.. …', 'ㄩ': '.. ._.', 'ㄚ': '.. ._…', 'ㄛ': '.. .._..', 'ㄜ': '.. …_.', 'ㄝ': '.. ._.._.', 'ㄞ': '.. ._._._.',
+  'ㄟ': '… ._.', 'ㄠ': '... .', 'ㄡ': '... ..', 'ㄢ': '… ...', 'ㄣ': '... ._.', 'ㄤ': '... ._…', 'ㄥ': '... .._..', 'ㄦ': '… …_.'
+};
+const toneMap = { 'ˉ': '.', 'ˊ': '..', 'ˇ': '…', 'ˋ': '….', '˙': '._…' };
+
+function invert(obj){ const r={}; for(const k in obj) r[obj[k]]=k; return r; }
+const revCode = invert(codeMap);
+const revTone = invert(toneMap);
+
+function encrypt(){
+  const input = document.getElementById('input').value.trim();
+  const outEl = document.getElementById('out');
+  if(!input){ outEl.textContent = ''; return; }
+  const toneChars = Object.keys(toneMap);
+  let lines = [];
+  let cur = [];
+  for(const ch of input){
+    if(ch === ' ' || ch === '\n' || ch === '\t') continue;
+    if(toneChars.includes(ch)){
+      if(cur.length === 0){
+      } else {
+        const codes = cur.map(p => codeMap[p] || '?').join(' ');
+        const toneCode = toneMap[ch] || '?';
+        lines.push((codes + ' ' + toneCode).trim());
+      }
+      cur = [];
+    } else {
+      cur.push(ch);
+    }
+  }
+  if(cur.length>0){
+    const codes = cur.map(p => codeMap[p] || '?').join(' ');
+    lines.push(codes);
+  }
+  outEl.textContent = lines.join('\n');
+}
+
+function decrypt(){
+  const text = document.getElementById('input').value.trim();
+  const outEl = document.getElementById('out');
+  if(!text){ outEl.textContent = ''; return; }
+  const lines = text.split(/\n+/).map(l=>l.trim()).filter(l=>l.length>0);
+  let result = '';
+  for(const line of lines){
+    const tokens = line.split(/\s+/).filter(t=>t.length>0);
+    if(tokens.length === 0) continue;
+    let toneToken = tokens[tokens.length-1];
+    let bodyTokens = tokens.slice(0, tokens.length-1);
+    if(!revTone[toneToken]){
+      toneToken = null;
+      bodyTokens = tokens.slice();
+    }
+    let i = 0;
+    while(i < bodyTokens.length){
+      let match = null;
+      let matchLen = 0;
+      for(let j = bodyTokens.length-1; j>=i; j--){
+        const cand = bodyTokens.slice(i, j+1).join(' ');
+        if(revCode[cand]){ match = revCode[cand]; matchLen = j - i + 1; break; }
+      }
+      if(match){
+        result += match;
+        i += matchLen;
+      } else {
+        result += '?';
+        i += 1;
+      }
+    }
+    if(toneToken){
+      const toneChar = revTone[toneToken] || '';
+      result += toneChar;
+    }
+  }
+  outEl.textContent = result;
+}
+</script>
+</body>
+</html>
