@@ -1,302 +1,538 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>注音暗語轉換工具</title>
+    <title>"._." Translation Tool</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 20px;
-            background-color: #f4f7f6;
-            color: #333;
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #c7d2fe 100%);
+            min-height: 100vh;
+            padding: 2rem;
         }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
         h1 {
-            color: #00796b;
-            border-bottom: 2px solid #00796b;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            color: #312e81;
+            margin-bottom: 0.5rem;
         }
+
+        .subtitle {
+            text-align: center;
+            color: #4b5563;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .mode-switch {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-purple {
+            background-color: #7c3aed;
+            color: white;
+        }
+
+        .btn-purple:hover {
+            background-color: #6d28d9;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
         textarea {
             width: 100%;
-            min-height: 150px;
-            padding: 15px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 16px;
-            font-family: monospace;
+            height: 16rem;
+            padding: 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #1f2937;
+            resize: none;
+            outline: none;
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            border-color: #4f46e5;
+        }
+
+        .output-box {
+            width: 100%;
+            height: 16rem;
+            padding: 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 0.5rem;
+            background-color: #f9fafb;
+            overflow-y: auto;
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #1f2937;
             white-space: pre-wrap;
-            word-wrap: break-word;
+            word-break: break-word;
+            line-height: 1.6;
         }
-        button {
-            padding: 10px 20px;
-            background-color: #00796b;
+
+        .output-box.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background-color: #4f46e5;
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-right: 10px;
-            transition: background-color 0.3s;
+            justify-content: center;
         }
-        button:hover {
-            background-color: #004d40;
+
+        .btn-primary:hover {
+            background-color: #4338ca;
         }
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        .btn-secondary {
+            background-color: #6b7280;
+            color: white;
+            justify-content: center;
         }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #00796b;
+
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+
+        .btn-success {
+            width: 100%;
+            background-color: #059669;
+            color: white;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .btn-success:hover {
+            background-color: #047857;
+        }
+
+        .btn-success:disabled {
+            background-color: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .placeholder {
+            color: #9ca3af;
         }
     </style>
 </head>
 <body>
-
-    <h1>注音暗語轉換工具</h1>
-
     <div class="container">
-        <label for="inputText">輸入:</label>
-        <textarea id="inputText" placeholder=""></textarea>
+        <h1>"._."暗語翻譯器</h1>
+        <p class="subtitle" id="modeTitle">"._." → 注音</p>
+        
+        <div class="mode-switch">
+            <button class="btn btn-purple" onclick="switchMode()">
+                <span>🔄</span>
+                <span>切換模式</span>
+            </button>
+        </div>
 
-        <button onclick="convertToCipher()">注音 → 暗語</button>
-        <button onclick="convertToZhuyin()">暗語 → 注音</button>
+        <div class="grid">
+            <div class="card">
+                <h2 class="card-title" id="inputTitle">輸入暗語</h2>
+                <textarea id="inputText" placeholder="輸入"._.",一行一字..."></textarea>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="translateText()">
+                        <span>→</span>
+                        <span>翻譯</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="reset()">
+                        <span>↻</span>
+                        <span>清除</span>
+                    </button>
+                </div>
+            </div>
 
-        <label for="outputText">輸出結果:</label>
-        <textarea id="outputText" readonly></textarea>
+            <div class="card">
+                <h2 class="card-title">翻譯結果</h2>
+                <div class="output-box empty" id="outputText">
+                    <span class="placeholder">翻譯結果將顯示在這裡...</span>
+                </div>
+                <button class="btn btn-success" onclick="copyToClipboard()" id="copyBtn" disabled>
+                    <span>📋</span>
+                    <span>複製結果</span>
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
-        const ZHUYIN_MAP = [
-            'ㄅ', 'ㄆ', 'ㄇ', 'ㄈ', 'ㄉ', 'ㄊ', 'ㄋ', 'ㄌ', 'ㄍ', 'ㄎ', 'ㄏ',
-            'ㄐ', 'ㄑ', 'ㄒ', 'ㄓ', 'ㄔ', 'ㄕ', 'ㄖ', 'ㄗ', 'ㄘ', 'ㄙ', 'ㄧ',
-            'ㄨ', 'ㄩ', 'ㄚ', 'ㄛ', 'ㄜ', 'ㄝ', 'ㄞ', 'ㄟ', 'ㄠ', 'ㄡ', 'ㄢ',
-            'ㄣ', 'ㄤ', 'ㄥ', 'ㄦ'
-        ];
+        let mode = 'decode';
 
-        const NUM_TO_CIPHER = [
-            '.', '..', '…', '....', '._…', '.._..', '…_.', '._.._.', '._._._.',
-            '. ._.', '. .', '. ..', '. …', '. ....', '. ._…', '. .._..', '. …_.', '. ._.._.', '. ._._._.',
-            '.. ._.', '.. .', '.. ..', '.. …', '.. ....', '.. ._…', '.. .._..', '.. …_.', '.. ._.._.', '.. ._._._.',
-            '… ._.', '… .', '… ..', '… …', '… ....', '… ._…', '… .._..', '… …_.'
-        ];
-
-        const TONE_TO_CIPHER = {
-            'ˉ': '.',
-            'ˊ': '..',
-            'ˇ': '…',
-            'ˋ': '....',
-            '˙': '._…'
+        const zhuyin = {
+            '.': 'ㄅ', '..': 'ㄆ', '...': 'ㄇ', '....': 'ㄈ',
+            '._...': 'ㄉ', '.._..': 'ㄊ', '..._.': 'ㄋ', '._.._.': 'ㄌ',
+            '._._._.': 'ㄍ', '. ._.': 'ㄎ', '. .': 'ㄏ',
+            '. ..': 'ㄐ', '. ...': 'ㄑ', '. ....': 'ㄒ',
+            '. ._...': 'ㄓ', '. .._..': 'ㄔ', '. ..._.': 'ㄕ',
+            '. ._.._.': 'ㄖ', '. ._._._.': 'ㄗ',
+            '.. ._.': 'ㄘ', '.. .': 'ㄙ', '.. ..': 'ㄧ',
+            '.. ...': 'ㄨ', '.. ....': 'ㄩ', '.. ._...': 'ㄚ',
+            '.. .._..': 'ㄛ', '.. ..._.': 'ㄜ', '.. ._.._.': 'ㄝ',
+            '.. ._._._.': 'ㄞ', '... ._.': 'ㄟ', '... .': 'ㄠ',
+            '... ..': 'ㄡ', '... ...': 'ㄢ', '... ....': 'ㄣ',
+            '... ._...': 'ㄤ', '... .._..': 'ㄥ', '... ..._.': 'ㄦ'
         };
 
-        const CIPHER_TO_TONE = {
-            '.': 'ˉ',
-            '..': 'ˊ',
-            '…': 'ˇ',
-            '....': 'ˋ',
-            '._…': '˙'
+        const tones = {
+            '.': 'ˉ', '..': 'ˊ', '...': 'ˇ', '....': 'ˋ', '._...': '˙'
         };
 
-        function cipherToNum(cipher) {
-            const index = NUM_TO_CIPHER.indexOf(cipher);
-            return index !== -1 ? index + 1 : -1;
+        const zhuyinReverse = Object.fromEntries(
+            Object.entries(zhuyin).map(([k, v]) => [v, k])
+        );
+
+        const tonesReverse = Object.fromEntries(
+            Object.entries(tones).map(([k, v]) => [v, k])
+        );
+        
+        const zhuyinToNumber = {};
+        Object.keys(zhuyin).forEach((key, index) => {
+            zhuyinToNumber[key] = index + 1;
+        });
+
+        function normalizeCode(code) {
+            return code.replace(/…/g, '...');
         }
 
-        function numToCipher(num) {
-            return NUM_TO_CIPHER[num - 1];
+        function getZhuyin(code) {
+            if (zhuyin[code]) return zhuyin[code];
+            const normalized = normalizeCode(code);
+            return zhuyin[normalized] || null;
         }
 
-        function isTone(char) {
-            return TONE_TO_CIPHER.hasOwnProperty(char);
+        function getTone(code) {
+            if (tones[code]) return tones[code];
+            const normalized = normalizeCode(code);
+            return tones[normalized] || null;
         }
 
-        function isZhuyin(char) {
-            return ZHUYIN_MAP.includes(char);
+         function getNumber(code) {
+            if (zhuyinToNumber[code]) return zhuyinToNumber[code];
+            const normalized = normalizeCode(code);
+            return zhuyinToNumber[normalized] || null;
         }
 
-        // --- 暗語 → 注音 (解碼) ---
-        function convertToZhuyin() {
-            const input = document.getElementById('inputText').value.trim();
-            const lines = input.split('\n').filter(line => line.trim() !== '');
-            let result = [];
+        function switchMode() {
+            mode = mode === 'decode' ? 'encode' : 'decode';
+            document.getElementById('modeTitle').textContent = mode === 'decode' ? '"._." → 注音' : '注音 → "._."';
+            document.getElementById('inputTitle').textContent = mode === 'decode' ? '輸入暗語' : '輸入注音';
+            document.getElementById('inputText').placeholder = mode === 'decode' ? '輸入"._.",一行一字...' : '輸入ㄓㄨˋㄧㄣˉ,ㄔㄐㄐ...';
+            
+            const btn = document.getElementById('copyBtn');
+            btn.innerHTML = '<span>📋</span><span>複製結果</span>';
+            
+            reset();
+        }
+
+        function decode() {
+            const input = document.getElementById('inputText').value;
+            const lines = input.split('\n');
+            const results = [];
 
             for (const line of lines) {
-                // Split the line by non-cipher symbols to handle punctuation (e.g., '…_. .. .. … !(你!)')
-                const parts = line.split(/([^.\s_]+)/).filter(p => p.length > 0);
-                let decodedLine = '';
+                const tokens = [];
+                let current = '';
+                let nonCodePrefix = '';
+                let nonCodeSuffix = '';
+                let codeStarted = false;
+                let codeEnded = false;
+                
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    
+                    if (codeEnded) {
+                        nonCodeSuffix += char;
+                    } else if (char === ' ') {
+                        if (current.length > 0) {
+                            tokens.push(current);
+                            current = '';
+                        }
+                    } else if (char === '.' || char === '_' || char === '…') {
+                        if (!codeStarted) {
+                            codeStarted = true;
+                        }
+                        current += char;
+                    } else {
+                        if (!codeStarted) {
+                            nonCodePrefix += char;
+                        } else {
+                            if (current.length > 0) {
+                                tokens.push(current);
+                                current = '';
+                            }
+                            codeEnded = true;
+                            nonCodeSuffix = char;
+                        }
+                    }
+                }
+                
+                if (current.length > 0 && !codeEnded) {
+                    tokens.push(current);
+                }
 
-                for (const part of parts) {
-                    // Check if the part is pure cipher (dots, underlines, spaces)
-                    if (/^[.\s_]+$/.test(part)) {
-                        const groups = part.trim().split(/\s+/).filter(g => g.length > 0);
-                        const groupCount = groups.length;
+                if (tokens.length === 0) {
+                    results.push(line);
+                    continue;
+                }
 
-                        if (groupCount < 2) continue;
+                let result = '';
+                let success = false;
+                const groupCount = tokens.length;
 
-                        const toneCipher = groups[groupCount - 1];
-                        const tone = CIPHER_TO_TONE[toneCipher] || `[Tone: ${toneCipher}]`;
+                const lastGroup = tokens[groupCount - 1];
+                const isValidTone = getTone(lastGroup) !== null;
 
-                        const zhuyinGroups = groups.slice(0, groupCount - 1);
-                        let decodedZhuyin = [];
-                        let errorFlag = false;
-
-                        // --- Core Decoding Logic based on Group Count Rules ---
-                        let decodingPattern = [];
-
+                if (isValidTone && (groupCount === 3 || groupCount === 4 || groupCount === 5 || groupCount === 6 || groupCount === 7)) {
                         if (groupCount === 3) {
-                            // [二組; 一組(聲調)] -> 2 groups for Zhuyin (1 unit: 2 groups)
-                            decodingPattern = [2];
-                        } else if (groupCount === 4) {
-                            // [一組; 二組; 一組(聲調)] -> 3 groups for Zhuyin (2 units: 1 group + 2 groups)
-                            decodingPattern = [1, 2];
-                        } else if (groupCount === 5) {
-                            // [二組; 二組; 一組(聲調)] -> 4 groups for Zhuyin (2 units: 2 groups + 2 groups)
-                            decodingPattern = [2, 2];
-                        } else if (groupCount === 6) {
-                            // [一組; 二組; 二組; 一組(聲調)] -> 5 groups for Zhuyin (3 units: 1 + 2 + 2)
-                            decodingPattern = [1, 2, 2];
-                        } else if (groupCount === 7) {
-                            // [二組; 二組; 二組; 一組(聲調)] -> 6 groups for Zhuyin (3 units: 2 + 2 + 2)
-                            decodingPattern = [2, 2, 2];
-                        } else {
-                            errorFlag = true;
+                        const part1 = tokens[0] + ' ' + tokens[1];
+                        const zhuyinChar = getZhuyin(part1);
+                        const toneChar = getTone(lastGroup);
+                        if (zhuyinChar && toneChar) {
+                            result = zhuyinChar + toneChar;
+                            success = true;
                         }
-
-                        if (!errorFlag) {
-                            let groupPointer = 0;
-                            for (const requiredGroups of decodingPattern) {
-                                const currentCipherGroups = zhuyinGroups.slice(groupPointer, groupPointer + requiredGroups);
-                                
-                                if (currentCipherGroups.length !== requiredGroups) {
-                                    errorFlag = true;
-                                    break;
-                                }
-                                
-                                // Combine the required groups with spaces to find the number in NUM_TO_CIPHER
-                                const zhuyinUnitCipher = currentCipherGroups.join(' ');
-                                const num = cipherToNum(zhuyinUnitCipher);
-
-                                if (num !== -1) {
-                                    decodedZhuyin.push(ZHUYIN_MAP[num - 1]);
-                                    groupPointer += requiredGroups;
-                                } else {
-                                    errorFlag = true;
-                                    break;
-                                }
-                            }
-                            
-                            if (groupPointer !== zhuyinGroups.length) {
-                                 errorFlag = true;
-                            }
+                    }
+                    else if (groupCount === 4) {
+                        const part1 = tokens[0];
+                        const part2 = tokens[1] + ' ' + tokens[2];
+                        const zhuyin1 = getZhuyin(part1);
+                        const zhuyin2 = getZhuyin(part2);
+                        const toneChar = getTone(lastGroup);
+                        if (zhuyin1 && zhuyin2 && toneChar) {
+                            result = zhuyin1 + zhuyin2 + toneChar;
+                            success = true;
                         }
-
-                        if (!errorFlag && decodedZhuyin.length > 0) {
-                            decodedLine += decodedZhuyin.join('') + tone;
-                        } else {
-                            decodedLine += `[Error: Decoding failed for "${zhuyinGroups.join(' ')}"]${tone}`;
+                    }
+                    else if (groupCount === 5) {
+                        const part1 = tokens[0] + ' ' + tokens[1];
+                        const part2 = tokens[2] + ' ' + tokens[3];
+                        const zhuyin1 = getZhuyin(part1);
+                        const zhuyin2 = getZhuyin(part2);
+                        const toneChar = getTone(lastGroup);
+                        if (zhuyin1 && zhuyin2 && toneChar) {
+                            result = zhuyin1 + zhuyin2 + toneChar;
+                            success = true;
                         }
-
-                    } else {
-                        decodedLine += part; // Preserve non-cipher symbols
+                    }
+                    else if (groupCount === 6) {
+                        const part1 = tokens[0];
+                        const part2 = tokens[1] + ' ' + tokens[2];
+                        const part3 = tokens[3] + ' ' + tokens[4];
+                        const zhuyin1 = getZhuyin(part1);
+                        const zhuyin2 = getZhuyin(part2);
+                        const zhuyin3 = getZhuyin(part3);
+                        const toneChar = getTone(lastGroup);
+                        if (zhuyin1 && zhuyin2 && zhuyin3 && toneChar) {
+                            result = zhuyin1 + zhuyin2 + zhuyin3 + toneChar;
+                            success = true;
+                        }
+                    }
+                    else if (groupCount === 7) {
+                        const part1 = tokens[0] + ' ' + tokens[1];
+                        const part2 = tokens[2] + ' ' + tokens[3];
+                        const part3 = tokens[4] + ' ' + tokens[5];
+                        const zhuyin1 = getZhuyin(part1);
+                        const zhuyin2 = getZhuyin(part2);
+                        const zhuyin3 = getZhuyin(part3);
+                        const toneChar = getTone(lastGroup);
+                        if (zhuyin1 && zhuyin2 && zhuyin3 && toneChar) {
+                            result = zhuyin1 + zhuyin2 + zhuyin3 + toneChar;
+                            success = true;
+                        }
                     }
                 }
-                result.push(decodedLine); // Each original line becomes one decoded block
+
+                if (!success) {
+                    for (const token of tokens) {
+                        const num = getNumber(token);
+                        if (num) {
+                            result += num;
+                        } else {
+                            result += token;
+                        }
+                    }
+                }
+
+                results.push(nonCodePrefix + result + nonCodeSuffix);
             }
 
-            document.getElementById('outputText').value = result.join('');
+            return results.join('\n');
         }
-        
-        // --- 注音 → 暗語 (編碼) ---
-        function convertToCipher() {
-            // Remove user-supplied newlines for continuous processing
-            const input = document.getElementById('inputText').value.replace(/\n/g, ''); 
-            let result = [];
-            let currentSyllable = []; 
 
-            for (let i = 0; i < input.length; i++) {
-                const char = input[i];
+        function encode() {
+            const text = document.getElementById('inputText').value.trim();
+            const results = [];
+            let parts = [];
+            let pendingPunctuation = '';
 
-                if (isZhuyin(char)) {
-                    currentSyllable.push(char);
-                } else if (isTone(char)) {
-                    // Syllable end: Found Z+T
-                    
-                    if (currentSyllable.length === 0) {
-                        result.push(char); // Tone without preceding Zhuyin (treat as symbol)
-                        continue;
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+
+                if (zhuyinReverse[char]) {
+                    const code = zhuyinReverse[char];
+                    if (code.includes(' ')) {
+                        const splitCode = code.split(' ');
+                        parts.push(splitCode[0]);
+                        parts.push(splitCode[1]);
+                    } else {
+                        parts.push(code);
+                    }
+                } else if (tonesReverse[char]) {
+                    parts.push(tonesReverse[char]);
+
+                    let j = i + 1;
+                    while (j < text.length) {
+                        const nextChar = text[j];
+                        if (nextChar.trim() === '' || nextChar === '\n') {
+                            j++;
+                            continue;
+                        }
+                        if (!zhuyinReverse[nextChar] && !tonesReverse[nextChar]) {
+                            pendingPunctuation += nextChar;
+                            i = j;
+                            j++;
+                        } else {
+                            break;
+                        }
                     }
 
-                    // 1. Convert syllable to cipher groups
-                    let syllableCipherGroups = [];
-                    for (const z of currentSyllable) {
-                        const num = ZHUYIN_MAP.indexOf(z) + 1;
-                        const zCipher = numToCipher(num);
-                        // Split the unit cipher (e.g., ". ..") into groups (e.g., [".", ".."])
-                        syllableCipherGroups.push(...zCipher.split(' ').filter(g => g.length > 0));
+                    if (parts.length > 0) {
+                        let line = parts.join(' ');
+                        if (pendingPunctuation) {
+                            line += ' ' + pendingPunctuation;
+                            pendingPunctuation = '';
+                        }
+                        results.push(line);
+                        parts = [];
                     }
-
-                    // 2. Add the tone cipher
-                    const toneCipher = TONE_TO_CIPHER[char];
-                    syllableCipherGroups.push(toneCipher);
-                    
-                    const fullCipher = syllableCipherGroups.join(' ');
-                    result.push(fullCipher); // Push the full cipher line
-                    
-                    currentSyllable = [];
-
+                } else if (char.trim() === '' || char === '\n') {
+                    continue;
                 } else {
-                    // Non-zhuyin/non-tone symbol encountered
-                    
-                    // Handle pending syllable (default to ˉ)
-                    if (currentSyllable.length > 0) {
-                        let syllableCipherGroups = [];
-                        for (const z of currentSyllable) {
-                            const num = ZHUYIN_MAP.indexOf(z) + 1;
-                            const zCipher = numToCipher(num);
-                            syllableCipherGroups.push(...zCipher.split(' ').filter(g => g.length > 0));
-                        }
-                        const toneCipher = TONE_TO_CIPHER['ˉ'];
-                        syllableCipherGroups.push(toneCipher);
-                        
-                        result.push(syllableCipherGroups.join(' '));
-                        currentSyllable = [];
-                    }
-                    
-                    // Handle symbol (append to last non-cipher line or start new line)
-                    if (result.length > 0 && !result[result.length - 1].includes(' ')) {
-                        // Append symbol if the last element is also a symbol
-                        result[result.length - 1] += char;
+                    if (parts.length === 0 && results.length === 0) {
+                        results.push(char);
                     } else {
-                        // Start new element if last element was a full cipher line
-                        result.push(char);
+                        pendingPunctuation += char;
                     }
                 }
             }
 
-            // Handle trailing syllable without a tone (default to ˉ)
-            if (currentSyllable.length > 0) {
-                let syllableCipherGroups = [];
-                for (const z of currentSyllable) {
-                    const num = ZHUYIN_MAP.indexOf(z) + 1;
-                    const zCipher = numToCipher(num);
-                    syllableCipherGroups.push(...zCipher.split(' ').filter(g => g.length > 0));
+            if (parts.length > 0) {
+                let line = parts.join(' ');
+                if (pendingPunctuation) {
+                    line += ' ' + pendingPunctuation;
                 }
-                const toneCipher = TONE_TO_CIPHER['ˉ'];
-                syllableCipherGroups.push(toneCipher);
-                result.push(syllableCipherGroups.join(' '));
+                results.push(line);
+            } else if (pendingPunctuation) {
+                results.push(pendingPunctuation);
             }
 
-            // Join the result lines with newline characters
-            document.getElementById('outputText').value = result.join('\n');
+            return results.join('\n');
         }
 
+        function translateText() {
+            const output = mode === 'decode' ? decode() : encode();
+            const outputBox = document.getElementById('outputText');
+            if (output) {
+                outputBox.textContent = output;
+                outputBox.className = 'output-box';
+            } else {
+                outputBox.innerHTML = '<span class="placeholder">翻譯結果將顯示在這裡...</span>';
+                outputBox.className = 'output-box empty';
+            }
+            document.getElementById('copyBtn').disabled = !output;
+        }
+
+        function reset() {
+            document.getElementById('inputText').value = '';
+            const outputBox = document.getElementById('outputText');
+            outputBox.innerHTML = '<span class="placeholder">翻譯結果將顯示在這裡...</span>';
+            outputBox.className = 'output-box empty';
+            document.getElementById('copyBtn').disabled = true;
+            
+            const btn = document.getElementById('copyBtn');
+            btn.innerHTML = '<span>📋</span><span>複製結果</span>';
+        }
+
+        function copyToClipboard() {
+            const output = document.getElementById('outputText').textContent;
+            navigator.clipboard.writeText(output).then(() => {
+                const btn = document.getElementById('copyBtn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<span>✓</span><span>已複製!</span>';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
     </script>
 </body>
 </html>
